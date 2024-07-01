@@ -10,38 +10,84 @@ export const VerPedido = () => {
 
   console.log("pedido:", productosDetalles)
 
+  // useEffect(() => {
+  //   const fetchPedido = async () => {
+  //     try {
+  //       const response = await axios.get(`/pedido/${id}`);
+  //       const pedidoData = response.data.pedido;
+  //       setPedido(pedidoData);
+
+  //       // Obtener detalles de los productos
+  //       const productosData = await Promise.all(
+  //         pedidoData.pedido.map(async (producto) => {
+  //           const productoResponse = await axios.get(`/productos/${producto.productId}`);
+  //           return { ...productoResponse.data, cantidad: producto.cantidad };
+  //         })
+  //       );
+
+  //       setProductosDetalles(productosData);
+
+  //       // Obtener detalles del usuario
+  //       const usuarioResponse = await axios.get(`/usuarios/${pedidoData.userId}`);
+  //       setUsuario(usuarioResponse.data);
+
+  //     } catch (error) {
+  //       console.error("Error fetching pedido:", error);
+  //     }
+  //   };
+
+  //   fetchPedido();
+  // }, [id]);
+
   useEffect(() => {
     const fetchPedido = async () => {
-      try {
-        const response = await axios.get(`/pedido/${id}`);
-        const pedidoData = response.data.pedido;
-        setPedido(pedidoData);
+        try {
+            const response = await axios.get(`/pedido/${id}`);
+            const pedidoData = response.data.pedido;
+            setPedido(pedidoData);
 
-        // Obtener detalles de los productos
-        const productosData = await Promise.all(
-          pedidoData.pedido.map(async (producto) => {
-            const productoResponse = await axios.get(`/productos/${producto.productId}`);
-            return { ...productoResponse.data, cantidad: producto.cantidad };
-          })
-        );
+            // Obtener detalles de los productos
+            const productosData = await Promise.all(
+                pedidoData.pedido.map(async (producto) => {
+                    try {
+                        const productoResponse = await axios.get(`/productos/${producto.productId}`);
+                        return { ...productoResponse.data, cantidad: producto.cantidad };
+                    } catch (error) {
+                        if (error.response && error.response.status === 404) {
+                            return { id: producto.productId, nombre: "No encontrado", cantidad: producto.cantidad };
+                        } else {
+                            throw error; // Lanza otros errores para ser capturados en el bloque de catch exterior
+                        }
+                    }
+                })
+            );
 
-        setProductosDetalles(productosData);
+            setProductosDetalles(productosData);
 
-        // Obtener detalles del usuario
-        const usuarioResponse = await axios.get(`/usuarios/${pedidoData.userId}`);
-        setUsuario(usuarioResponse.data);
-
-      } catch (error) {
-        console.error("Error fetching pedido:", error);
-      }
+            // Obtener detalles del usuario
+            try {
+                const usuarioResponse = await axios.get(`/usuarios/${pedidoData.userId}`);
+                setUsuario(usuarioResponse.data);
+            } catch (error) {
+                if (error.response && error.response.status === 404) {
+                    setUsuario({ nombre: "No encontrado" });
+                } else {
+                    throw error; // Lanza otros errores para ser capturados en el bloque de catch exterior
+                }
+            }
+        } catch (error) {
+            console.error("Error fetching pedido:", error);
+        }
     };
 
     fetchPedido();
-  }, [id]);
+}, [id]);
+
+
 
   if (!pedido || !usuario) {
     return (
-        <div className='flex w-[79%] h-screen justify-center items-center'>
+        <div className='flex w-[79%] mq980:w-full h-screen justify-center items-center'>
             <box-icon name='loader-circle' animation='spin' color='#C41111' size="70px"></box-icon>
         </div>
     )
@@ -79,11 +125,13 @@ export const VerPedido = () => {
 const calcularSubtotal = (precio, cantidad) => {
     return (precio * cantidad).toFixed(2);
 };
+
+console.log("productosdetalles 111:", productosDetalles)
   return (
-    <div className="w-[79%] mt-20">
+    <div className="w-[79%] mt-20 mq980:w-full">
       <div className="w-full h-full p-12 bg-white flex flex-col">
-        <div className="flex flex-row justify-around">
-            <div className="border shadow-md rounded-sm p-4">
+        <div className="flex flex-row justify-around mq980:flex-col">
+            <div className="border shadow-md rounded-sm p-4 mq980:mb-2">
                 <h1 className="font-bold text-2xl mb-4">Detalles del pedido</h1>
                     <div className=" flex flex-col">
                         <div className="flex flex-row">
@@ -107,76 +155,74 @@ const calcularSubtotal = (precio, cantidad) => {
                 </div>
         </div>
         <div className="flex flex-col border shadow-md rounded-sm p-4 mt-12">
-            <h1 className="font-bold text-2xl mb-4">Lista de productos</h1>
-            <div className=" flex flex-row w-[100%] font-bold py-4 border-b px-2">
-                <div className="flex flex-row w-[30%]">
+            <h1 className="font-bold text-2xl mb-4">Pedido</h1>
+            <div className=" flex flex-row w-[100%] font-bold py-4 border-b px-2 mq980:px-0 ">
+                <div className="flex flex-row w-[30%] mq980:hidden">
                     <div className="w-[30%]"></div>
-                    <div className="w-[70]">Nombre</div>
+                    <div className="w-[70%]">Nombre</div>
                 </div>  
-                <div className="w-[70%] flex flex-row ">
-                    <div className="w-[40%]">Valor</div>
+                <div className="w-[70%] flex flex-row mq980:w-full mq980:justify-between">
+                    <div className="w-[40%] mq980:w-[30%]">Valor</div>
                     <div className="w-[30%]">Cantidad</div>
                     <div className="w-[30%]">Subtotal</div>
                 </div>
             </div>
-            <div className="flex flex-row w-[100%] border-b p-2">
-                {productosDetalles.length > 1 ? (
-                        productosDetalles.map((producto) => (
-                            <div className="w-[30%] flex flex-row items-center">
-                                <div className="w-[30%]">
-                                    <img 
-                                            src={`https://back.paravosdistribuidora.com.ar/${producto.imagen.split(',')[0]}`} 
-                                            alt={producto.name} 
-                                            className="w-16 h-16 object-cover shadow-md"
-                                    />
-                                </div>
-                                <p className=" font-semibold w-[70%]"><strong>Nombre:</strong> {producto.producto.name}</p>
+
+<div className="flex flex-col w-full p-2">
+    {pedido.pedido.map((productoPedido, index) => {
+        const productoDetalle = productosDetalles[index];
+        const producto = productoDetalle.producto || productoDetalle;
+        const descuento = calcularDescuento(productoPedido.precioVenta, productoPedido.precioPromo);
+        const precioFinal = !isNaN(productoPedido.precioPromo) && productoPedido.precioPromo !== null ? productoPedido.precioPromo : productoPedido.precioVenta;
+        const subtotal = calcularSubtotal(precioFinal, productoPedido.cantidad);
+
+        return (
+            <div className="flex flex-row w-full items-center p-2 border-b mq980:flex-col" key={index}>
+              <div className="w-[30%] flex flex-row mq980:w-full mq980:items-center">
+                <div className="w-[30%] mq980:w-auto">
+                    <img 
+                        src={producto.imagen ? `https://back.paravosdistribuidora.com.ar/${producto.imagen.split(',')[0]}` : ""} 
+                        alt={producto.name || "No encontrado"} 
+                        className="w-16 h-16 object-cover shadow-md"
+                    />
+                </div>
+                <p className="font-semibold w-[70%] mq980:w-auto">
+                    {producto.name || productoDetalle.nombre || "No encontrado"}
+                </p>
+                </div>
+                <div className="w-[70%] flex flex-row mq980:w-full mq980:justify-between">
+                <div className="w-[40%] mq980:w-auto">
+                    {(!isNaN(productoPedido.precioPromo) && productoPedido.precioPromo !== null) ? (
+                        <div className="flex flex-col">
+                            <div className="flex flex-row">
+                                <p className="text-gris line-through mq980:hidden">${productoPedido.precioVenta}</p>
+                                <p className="ml-1 font-semibold">${productoPedido.precioPromo}</p>
                             </div>
-                        ))
-                        ) : (
-                            <div className="flex flex-row w-[30%] items-center">
-                                <div className="w-[30%]">
-                                <img 
-                                        src={`https://back.paravosdistribuidora.com.ar/${productosDetalles[0].producto.imagen.split(',')[0]}`} 
-                                        alt={productosDetalles[0].producto.name} 
-                                        className="w-16 h-16 object-cover shadow-md"
-                                />
-                                </div>
-                                <p className="font-semibold w-[70%]">{productosDetalles[0].producto.name}</p>
-                            </div>
-                        )}
-                        {pedido.pedido.map((producto) => {
-                                const descuento = calcularDescuento(producto.precioVenta, producto.precioPromo);
-                                const precioFinal = !isNaN(producto.precioPromo) && producto.precioPromo !== null ? producto.precioPromo : producto.precioVenta;
-                                const subtotal = calcularSubtotal(precioFinal, producto.cantidad);
-                                return (
-                                    <div className="flex flex-row w-[70%] items-center" key={producto.productId}>
-                                        {(!isNaN(producto.precioPromo) && producto.precioPromo !== null) ? (
-                                            <div className=" flex flex-col w-[40%]">
-                                                <div className="flex flex-row">
-                                                    <p className="text-gris line-through">${producto.precioVenta}</p>
-                                                    <p className="ml-1 font-semibold">${producto.precioPromo}</p>
-                                                </div>
-                                                <p className="text-green-700">{descuento !== null ? `${descuento}% de descuento` : ''}</p>
-                                            </div>
-                                        ) : (
-                                            <p className="font-semibold  w-[40%]">${producto.precioVenta}</p>
-                                        )}
-                                        <p className=" w-[30%]">{producto.cantidad}</p>
-                                        <p className=" w-[30%]">{subtotal}</p>
-                                    </div>
-                                );
-                            })}  
+                            <p className="text-green-700 mq980:hidden">{descuento !== null ? `${descuento}% de descuento` : ''}</p>
+                        </div>
+                    ) : (
+                        <p className="font-semibold">${productoPedido.precioVenta}</p>
+                    )}
+                </div>
+                <p className="w-[30%] mq980:w-auto text-start">{productoPedido.cantidad}</p>
+                <p className="w-[30%] mq980:w-auto text-start">${subtotal}</p>
             </div>
-            <div className=" flex flex-row w-[100%] py-4 px-2">
-                <div className="flex flex-row w-[30%]">
+            </div>
+        );
+    })}
+</div>
+
+
+
+            <div className=" flex flex-row w-[100%] py-4 px-2 ">
+                <div className="flex flex-row w-[30%] mq980:hidden">
                     <div className="w-[30%]"></div>
                     <div className="w-[70]"></div>
                 </div>  
-                <div className="w-[70%] flex flex-row ">
+                <div className="w-[70%] flex flex-row mq980:w-full">
                     <div className="w-[40%]"></div>
-                    <div className="w-[30%]"></div>
-                    <div className="w-[30%] font-bold text-xl">Total ${pedido.total}</div>
+                    <div className="w-[30%] font-bold text-xl">Total</div>
+                    <div className="w-[30%] font-bold text-xl mq980:mr-2"> ${pedido.total}</div>
                 </div>
             </div>
         </div>

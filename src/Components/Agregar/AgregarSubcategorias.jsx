@@ -96,11 +96,11 @@ export const AgregarSubcategorias = () => {
 
     
     return (
-        <div className="flex items-center w-[79%] h-full justify-center">
+        <div className="flex items-center w-[79%] h-full justify-center mq980:w-full">
         <div className="flex flex-col items-start justify-center" >
         <h1 className="flex flex-col items-start font-bold text-2xl mb-2 mt-4">Nueva subcategoría</h1>
             <form className="" onSubmit={handleSubmit}>
-                <div className="border border-grismedio rounded-md p-4 shadow-md w-[500px] mb-4">
+                <div className="border border-grismedio rounded-md p-4 shadow-md w-[500px] mb-4 mq980:w-full">
                     <div className="flex flex-row items-center justify-between">
                         <h2 className="text-sm mb-2 ">Categoría a la que pertenece</h2>
                             <p className="text-rojo flex justify-center text-[14px]">{inputError.categoriaId.error}</p> 

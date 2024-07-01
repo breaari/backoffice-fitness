@@ -21,6 +21,7 @@ import { EditarProducto } from './Components/Editar/editarProductos';
 import { Listadecarritos } from './Components/Lista/Listadecarritos';
 import { Listadepedidos } from './Components/Lista/Listadepedidos';
 import { VerPedido } from './Components/Editar/verPedido';
+import { AgregarPedido } from './Components/Agregar/agregarPedido';
 
 function App() {
   const dispatch = useDispatch();
@@ -77,6 +78,7 @@ function App() {
 
           <Route path='listadepedidos' element={<Listadepedidos/>}/>
           <Route path='listadepedidos/:id' element={<VerPedido/>}/>
+          <Route path='listadepedidos/agregarpedido' element = {<AgregarPedido></AgregarPedido>} />
         </Route>
         <Route path="/acceso-denegado" element={<AccesoDenegado />} /> 
       </Routes>

@@ -91,7 +91,7 @@ const handleDeleteSubcategoria = async (id) => {
 };
 
     return (
-        <div className="w-[79%] mt-20"> 
+        <div className="w-[79%] mt-20 mq980:w-full"> 
             <div className=" w-full h-full p-6 flex flex-col">
                 <div className="flex flex-row bg-white justify-between">
                     <h1 className="font-bold text-2xl">Categorias</h1>
@@ -133,7 +133,7 @@ const handleDeleteSubcategoria = async (id) => {
                         <RxDragHandleDots2 className="mr-1" />
                         {nombreSubcategoria.nombre}
                         </div>
-                        <div>
+                        <div className="flex flex-row">
                               <button className="bg-grismedio text-white p-1 rounded mr-2" 
                                   onClick={() => goTo(`/admin/categorias/editarsubcategoria/${nombreSubcategoria.id}`)}>
                                   <FaRegEdit className="text-[18px]" />

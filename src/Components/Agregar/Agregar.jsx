@@ -42,7 +42,7 @@ export const Agregar = () => {
         const initialErrors= {
           id: { valid: false, error: '' },          
           name: { valid: false, error: '' },
-          ganancia: { valid: false, error: '' },
+        //   ganancia: { valid: false, error: '' },
           descripcion: { valid: false, error: '' },
           preciocompra: { valid: false, error: '' },
           preciopromo: { valid: true, error: '' },
@@ -108,13 +108,13 @@ export const Agregar = () => {
                 }));
               }
 
-              if (name === 'ganancia') {
-                const { valid, error } = isValidGanancia(value);
-                setInputError((prevInputError) => ({
-                  ...prevInputError,
-                  ganancia: { valid, error }
-                }));
-              }
+            //   if (name === 'ganancia') {
+            //     const { valid, error } = isValidGanancia(value);
+            //     setInputError((prevInputError) => ({
+            //       ...prevInputError,
+            //       ganancia: { valid, error }
+            //     }));
+            //   }
 
               if (name === 'preciopromo') {
                 const { valid, error } = isValidPreciopromo(value, input.precioventa, input.preciocompra);
@@ -190,18 +190,18 @@ export const Agregar = () => {
             }
           };
 
-        useEffect(() => {
-            if (input.preciocompra && input.ganancia) {
-                const gananciaDecimal = parseFloat(input.ganancia) / 100;
-                const nuevoPrecioVenta = gananciaDecimal > 1
-                    ? (parseFloat(input.preciocompra) * (1 + gananciaDecimal)).toFixed(2)
-                    : (parseFloat(input.preciocompra) / (1 - gananciaDecimal)).toFixed(2);
-                setInput((prevInput) => ({
-                    ...prevInput,
-                    precioventa: nuevoPrecioVenta
-                }));
-            }
-        }, [input.preciocompra, input.ganancia]);
+        // useEffect(() => {
+        //     if (input.preciocompra && input.ganancia) {
+        //         const gananciaDecimal = parseFloat(input.ganancia) / 100;
+        //         const nuevoPrecioVenta = gananciaDecimal > 1
+        //             ? (parseFloat(input.preciocompra) * (1 + gananciaDecimal)).toFixed(2)
+        //             : (parseFloat(input.preciocompra) / (1 - gananciaDecimal)).toFixed(2);
+        //         setInput((prevInput) => ({
+        //             ...prevInput,
+        //             precioventa: nuevoPrecioVenta
+        //         }));
+        //     }
+        // }, [input.preciocompra, input.ganancia]);
         
 
         const [images, setImages] = useState([]);
@@ -223,7 +223,7 @@ export const Agregar = () => {
             containers.push(
                 <div
                     key={i}
-                    className="flex flex-col w-[23%] h-[150px] border-2 border-rojo shadow-md rounded-md justify-center items-center cursor-pointer overflow-hidden"
+                    className="flex flex-col w-[23%] mq980:w-[47%] h-[150px] border-2 border-rojo shadow-md rounded-md justify-center items-center cursor-pointer overflow-hidden"
                     onClick={() => images[i] ? handleImageClick(images[i]) : document.getElementById(`fileInput${i}`).click()}
                 >
                     {images[i] ? (
@@ -288,13 +288,11 @@ export const Agregar = () => {
         fetchCategorias();
     }, []);
 
-console.log("input:", input)
 
 const handleSubmit = async (e) => {
     e.preventDefault();
     const formData = new FormData();
 
-    // Add text inputs to FormData
     for (const key in input) {
         if (key === 'stock' || key === 'variantes' || key === 'subcategoria') {
             formData.append(key, JSON.stringify(input[key]));
@@ -303,7 +301,6 @@ const handleSubmit = async (e) => {
         }
     }
 
-    // Add images to FormData
     input.imagen.forEach((image) => {
         formData.append('imagenes', image);
     });
@@ -329,7 +326,7 @@ const handleSubmit = async (e) => {
 };
 
     return (
-        <div className="w-[79%] mt-[74px] px-32 flex flex-col" >
+        <div className="w-[79%] mt-[74px] px-32 flex flex-col mq980:w-full mq980:px-6" >
             <h1 className="font-bold text-2xl mb-2 mt-4">Nuevo producto</h1>
             <form onSubmit={handleSubmit}>
                 <div className="border border-grismedio rounded-md p-4 shadow-md">
@@ -408,12 +405,12 @@ const handleSubmit = async (e) => {
                     <div className="flex flex-row items-center justify-between">
                         <h1 className="font-semibold text-lg mb-2">Precio</h1>
                         <p className="text-rojo flex justify-center text-[14px]">{inputError.preciocompra.error}</p>
-                        <p className="text-rojo flex justify-center text-[14px]">{inputError.ganancia.error}</p>
+                        {/* <p className="text-rojo flex justify-center text-[14px]">{inputError.ganancia.error}</p> */}
                     </div>
-                    <div className="flex flex-row justify-between">
+                    <div className="flex flex-row justify-between mq980:flex-col mq980:justify-start">
                         <div className="flex flex-col">
                                 <h2 className="text-sm my-2">Precio de compra</h2>
-                                <label className="border-grismedio border rounded-md px-2 py-1 text-sm">$
+                                <label className="border-grismedio border rounded-md px-2 py-1 text-sm mq980:w-[175px]">$
                                     <input className="text-sm focus:outline-none w-[100px] ml-1"
                                     type="number"
                                     min="1"
@@ -425,7 +422,7 @@ const handleSubmit = async (e) => {
                                     </input>ARS
                                 </label>
                         </div>
-                            <div  className="flex flex-col">
+                            {/* <div  className="flex flex-col">
                         <h2 className="text-sm my-2">Ganancia</h2>
                             <label className="border-grismedio border rounded-md px-2 py-1 text-sm">
                                 <input type="number" 
@@ -438,10 +435,10 @@ const handleSubmit = async (e) => {
                                         onChange={handleChange}
                                 ></input>
                             % </label>
-                            </div>
+                            </div> */}
                                 <div  className="flex flex-col">
                                 <h2 className="text-sm my-2">Precio de venta</h2>
-                                <label className="border-grismedio border rounded-md px-2 py-1 text-sm">$
+                                <label className="border-grismedio border rounded-md px-2 py-1 text-sm  mq980:w-[175px]">$
                                     <input className="text-sm focus:outline-none ml-1 w-[100px]"
                                             type="text"
                                             value={input.precioventa} 
@@ -451,7 +448,7 @@ const handleSubmit = async (e) => {
                                 </div>
                                 <div  className="flex flex-col">
                                     <h2 className="text-sm my-2">Precio promocional</h2>
-                                        <label className="border-grismedio border rounded-md px-2 py-1 text-sm">$
+                                        <label className="border-grismedio border rounded-md px-2 py-1 text-sm  mq980:w-[175px]">$
                                             <input className="text-sm focus:outline-none ml-1 w-[100px]"
                                             type="number"
                                             min="1"

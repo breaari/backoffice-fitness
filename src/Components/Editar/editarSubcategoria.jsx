@@ -72,10 +72,10 @@ export const EditarSubcategoria = () => {
     };
 
     return (
-        <div className="flex items-center w-[79%] h-full justify-center mt-[74px]">
+        <div className="flex items-center w-[79%] h-full justify-center mt-[74px] mq980:w-full">
             <div className="flex flex-col items-start justify-center">
                 <h1 className="flex flex-col items-start font-bold text-2xl mb-2 mt-4">Editar subcategoría</h1>
-                <div className="border border-grismedio rounded-md p-4 shadow-md w-[500px] mb-4">
+                <div className="border border-grismedio rounded-md p-4 shadow-md w-[500px] mb-4 mq980:w-full">
                     <div className="flex flex-row items-center justify-between">
                         <h2 className="text-sm mb-2">Categoría a la que pertenece</h2>
                     </div>

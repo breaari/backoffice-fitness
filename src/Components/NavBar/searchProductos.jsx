@@ -20,26 +20,26 @@ export const SearchProductos = ({
                                 }) => {
   return (
     <div className='my-4 flex flex-row justify-between'>
-      <form onSubmit={ handleSearch } className='w-[94%]'>
+      <form onSubmit={ handleSearch } className='w-[94%] mq980:w-full'>
         <div className='flex flex-row w-full justify-between'>
-          <label className='border-grismedio border rounded-md p-1 flex flex-row items-center w-[74%]'>
-            <FiSearch className='text-grismedio text-[22px]' />
+          <label className='border-grismedio border rounded-md p-1 flex flex-row items-center w-[74%] mq980:w-[92%]'>
+            <FiSearch className='text-grismedio text-[22px] mq980:text-[30px]' />
             <input
               type="text"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Buscar productos por nombre..."
-              className=' px-2 focus:outline-none w-[700px]'
+              className='px-2 focus:outline-none w-[700px] mq980:w-auto'
             />
           </label>
-          <button type="submit" className='text-white px-2 py-1 bg-rojo font-bold rounded-md w-[25%]'>Buscar</button>
+          <button type="submit" className='text-white px-2 py-1 bg-rojo font-bold rounded-md w-[25%] mq980:hidden'>Buscar</button>
         </div>
       </form>
-      <button className='w-[5%]' onClick={toggleFilter}>
-        <IoFilter className='text-[30px] mx-2' />
+      <button className='w-[5%] mq980:w-[8%]' onClick={toggleFilter}>
+        <IoFilter className='text-[30px] mx-2  mq980:mr-6' />
       </button>
       {showFilter && (
-        <div className='absolute top-[200px] right-[30px] bg-white p-4 border border-gray-300 rounded-md shadow-lg z-50'>
+        <div className='absolute top-[200px] right-[30px] mq980:top-[320px] bg-white p-4 border border-gray-300 rounded-md shadow-lg z-50'>
           <div className='flex flex-row items-center justify-between'>
           <p className='font-bold mb-2'>Filtros</p>
           <button className="text-sm mb-2 text-rojo hover:underline" onClick={handleResetFilter}>Limpiar filtros</button>

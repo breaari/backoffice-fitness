@@ -8,6 +8,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { SearchProductos } from "../NavBar/searchProductos";
 import { getSubcategorias } from "../Hooks/getSubcategorias";
 import { getCategorias } from "../Hooks/getCategorias";
+import { ImportarExcel } from "./importarExcel";
 
 export const Listadeproductos = () => {
     const [productos, setProductos] = useState([]);
@@ -135,6 +136,7 @@ export const Listadeproductos = () => {
     setSelectedCategoria("");
     setSelectedStock("");
     setSelectedSubcategoria("");
+    setShowFilter(false)
   };
 
 const toggleFilter = () => {
@@ -247,7 +249,7 @@ const toggleFilter = () => {
     };
 
     return (
-        <div className="w-[79%] mt-20"> 
+        <div className="w-[79%] mq980:w-full mt-20"> 
             <div className="w-full h-full p-6">
                 <div className="flex flex-row bg-white justify-between">
                     <h1 className="font-bold text-2xl">Productos</h1>
@@ -255,6 +257,9 @@ const toggleFilter = () => {
                         <IoMdAddCircleOutline />
                         <button className="ml-1" onClick={() => goTo('/admin/listadeproductos/agregarproductos')}>Agregar producto</button>
                     </div>
+                </div>
+                <div>
+                        <ImportarExcel></ImportarExcel>
                 </div>
                 <div>
                    <SearchProductos  query={query}
@@ -273,7 +278,7 @@ const toggleFilter = () => {
                                     handleResetFilter={handleResetFilter}
                     /> 
                 </div>
-                <div className="flex flex-row justify-start font-bold text-lg px-4">
+                <div className="mq980:hidden flex flex-row justify-start font-bold text-lg px-4">
                     <div className="w-[35%] border-b border-gray-200 py-2">Producto</div>
                     <div className="w-[15%] border-b border-gray-200 py-2">Stock</div>
                     <div className="w-[15%] border-b border-gray-200 py-2">Compra</div>
@@ -284,12 +289,78 @@ const toggleFilter = () => {
               
             <div className="mt-4">
     {productos.map(producto => (
+            <div>
+                <div className="hidden mq980:block flex-row p-4 my-4 rounded-sm py-2 border-b border-gray-200 bg-white w-full">
+                <div className="flex flex-row justify-start h-full w-full">
+                    <div className="flex flex-row w-full mb-2">
+                        <div className="w-[25%]">
+                        <img 
+                            src={producto.imagen ? `https://back.paravosdistribuidora.com.ar/${producto.imagen.split(',')[0]}` : ''} 
+                            alt={producto.name} 
+                            className="w-16 h-16 object-cover"
+                        />
+                       </div> 
+                        <div className="w-[75%]">
+                        <Link to={`/admin/listadeproductos/editarproducto/${producto.id}`} className="flex-1">
+                            <h3 className=" font-semibold px-2 truncate max-w-[250px]">{producto.name}</h3>
+                        </Link>
+                        <div className="flex flex-row justify-between">
+                            <div className="flex flex-col px-2">
+                                <a className="text-sm font-semibold text-gray-500">Stock</a>
+                                <label className={`${producto.stock.limitado === "0" || producto.stock.limitado === 0 ? 'border-rojo' : ''}  border-grismedio border rounded-md p-1 flex items-center text-sm w-[60px]`}>
+                                    <input 
+                                        min={0}
+                                        max={10000000}
+                                        type="number" 
+                                        value={producto.stock.infinito ? '' : producto.stock.limitado}
+                                        onChange={(e) => {
+                                            const inputValue = e.target.value;
+                                            let newStock = {};
 
-            <div key={producto.id} className="flex flex-row p-4 my-4 rounded-md py-2 border-b border-gray-200 bg-white w-full">
+                                            if (inputValue === '') {
+                                                newStock = { infinito: true, limitado: '' };
+                                            } else {
+                                                newStock = { infinito: false, limitado: inputValue };
+                                            }
+
+                                            handleStockChange(producto.id, newStock);
+                                        }} 
+                                        className={`${producto.stock.limitado === "0" || producto.stock.limitado === 0 ? 'text-rojo' : ''} text-sm px-2 w-[50px] focus:outline-none no-spinners`}
+                                    />
+                                </label>
+                            </div> 
+                            <div className="flex flex-col px-2">
+                                <a className="text-sm font-semibold text-gray-500">Precio compra</a>
+                                <label className="border-grismedio border rounded-md p-1 flex items-center text-sm w-[100px]">$
+                                    <input 
+                                        min={0}
+                                        max={10000000}
+                                        type="number" 
+                                        value={producto.preciocompra} 
+                                        onChange={(e) => handlePrecioCompraChange(producto.id, e.target.value)}
+                                        className="text-sm px-2 w-[80px] focus:outline-none" 
+                                    />
+                                </label>
+                            </div>
+                            <div className="flex items-end">
+                                <button className="bg-rojo text-white p-1 rounded"
+                                    onClick={() => handleDelete(producto.id)}
+                                >
+                                    <RiDeleteBin6Fill className="text-[18px]"/>
+                                </button>
+                            </div> 
+                        </div>
+                        </div>
+                    </div>
+                        
+                    </div>
+                </div>
+
+            <div key={producto.id} className="mq980:hidden flex flex-row p-4 my-4 rounded-md py-2 border-b border-gray-200 bg-white w-full">
                 <div className="flex flex-row justify-start h-full w-full">
                     <div className="flex flex-row w-[35%] mb-2">
                         <img 
-                            src={`https://back.paravosdistribuidora.com.ar/${producto.imagen.split(',')[0]}`} 
+                            src={producto.imagen ? `https://back.paravosdistribuidora.com.ar/${producto.imagen.split(',')[0]}` : ''} 
                             alt={producto.name} 
                             className="w-16 h-16 object-cover"
                         />
@@ -365,7 +436,7 @@ const toggleFilter = () => {
                     </div>
                 </div>
             </div>
-        // )
+            </div>
     ))}
 </div>
 </div>

@@ -19,55 +19,58 @@ export const Listadeusuarios = () => {
     const [usuarios, setUsuarios] = useState([]);
     const [query, setQuery] = useState('')
     const [tipo, setTipo] = useState('');
-
     console.log("tipo:", tipo)
-
+    console.log("qury:", query)
+    
+  
     const fetchUsuarios = async (query = '', tipo = '') => {
-        //setLoading(true);
         try {
-            let url = `/usuarios`;
-            if (query || tipo) {
-                url = `/usuarios/search`;
-            }
+            let url = '/usuarios/search';
             const params = new URLSearchParams();
-            if (query) params.append('q', query);
-            if (tipo) params.append('tipo', tipo);
+    
+            if (tipo) {
+                params.append('tipo', tipo);
+            } else if (query) {
+                params.append('q', query);
+            }
+    
             if (params.toString()) {
                 url += `?${params.toString()}`;
+            } else {
+                url = '/usuarios';
             }
-
+    
+            console.log("url:", url);
             const response = await axios.get(url);
-            console.log("response:", response.data);
-            const usuario = response.data;
-            console.log("usuario:", usuario);
-          if (usuario.success) {
-            const sortedUsuarios = usuario.usuarios.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-            setUsuarios(sortedUsuarios);
-          } 
-          //setLoading(false);
+            if (response.data.success) {
+                const usuariosData = response.data.usuarios;
+                const sortedUsuarios = usuariosData.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+                setUsuarios(sortedUsuarios);
+            }
         } catch (error) {
-            if (error.response.status === 404) {
+            if (error.response && error.response.status === 404) {
                 toast.error('No se encontraron usuarios que coincidan con la consulta.', {
                     toastId: 'delete-error-toast',
                 });
-            } if (error.response.status === 500) {
+            } else if (error.response && error.response.status === 500) {
                 toast.error('Error al obtener los usuarios', {
                     toastId: 'delete-error-toast',
                 });
             }
-          console.error('Error al obtener los usuarios:', error);
-         
-          //setLoading(false);
-        }
-      };
+            console.error('Error al obtener los usuarios:', error);
+    }
+};
+    
+    
+    
     
       useEffect(() => {
         fetchUsuarios(); // Fetch all users on initial load
     }, []);
 
     useEffect(() => {
-        fetchUsuarios( tipo); // Fetch users whenever query or tipo changes
-    }, [ tipo]);
+        fetchUsuarios( "", tipo); // Fetch users whenever query or tipo changes
+    }, ["", tipo]);
 
       const handleSearch = async (e) => {
         e.preventDefault();
@@ -95,7 +98,7 @@ export const Listadeusuarios = () => {
 
 
     return (
-        <div className="w-[79%] mt-20 p-6"> 
+        <div className="w-[79%] mt-20 p-6 mq980:w-full"> 
             <div className="flex flex-row justify-between ">
                 <h1 className="font-bold text-2xl">Usuarios</h1>
                 <div className="flex flex-row bg-rojo text-white text-[14px] items-center font-semibold px-2 py-1 rounded-md">
@@ -108,34 +111,32 @@ export const Listadeusuarios = () => {
             </div>
             <div>
                 <table className="w-full bg-white text-left">
-                        <thead className="">
-                            <tr className="">
-                                <th className="py-2 border-b border-gray-200 w-[25%]">Nombre</th>
-                                <th className="py-2 border-b border-gray-200 w-[25%]">Email</th>
-                                <th className="py-2 border-b border-gray-200 w-[25%]">Usuario</th>
-                                <th className="py-2 border-b border-gray-200 w-[25%]">Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody className="">
-                            {usuarios.map((usuario) => (
-                                <tr key={usuario.id}>
-                                    <td className="py-2 border-b border-gray-200  w-[25%]">{usuario.usuario}</td>
-                                    <td className="py-2 border-b border-gray-200  w-[25%]">{usuario.email}</td>
-                                    <td className="py-2 border-b border-gray-200  w-[25%]">{usuario.tipo}</td>
-                                    <td className="py-2 border-b border-gray-200 w-[25%]">
-                                        <button className="bg-grismedio text-white p-2 rounded mr-2" 
-                                                onClick={() => goTo(`/admin/listadeusuarios/editarusuarios/${usuario.id}`)}>
+                    <thead>
+                        <tr>
+                            <th className="py-2 border-b border-gray-200 w-[25%] mq980:hidden">Nombre</th>
+                            <th className="py-2 border-b border-gray-200 w-[25%] mq980:w-[33%]">Email</th>
+                            <th className="py-2 border-b border-gray-200 w-[25%] mq980:w-[33%]">Usuario</th>
+                            <th className="py-2 border-b border-gray-200 w-[25%] mq980:w-[33%]">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody className="text-sm">
+                        {usuarios.map((usuario) => (
+                            <tr key={usuario.id}>
+                                <td className="py-2 border-b border-gray-200 w-[25%] mq980:hidden">{usuario.usuario}</td>
+                                <td className="py-2 border-b border-gray-200 w-[25%] mq980:w-[33%]">{usuario.email}</td>
+                                <td className="py-2 border-b border-gray-200 w-[25%] mq980:w-[33%]">{usuario.tipo}</td>
+                                <td className="py-2 border-b border-gray-200 w-[25%] mq980:w-[33%] flex flex-row">
+                                    <button className="bg-grismedio text-white p-2 rounded mr-2" onClick={() => goTo(`/admin/listadeusuarios/editarusuarios/${usuario.id}`)}>
                                         <FaRegEdit />
-                                        </button>
-                                        <button className="bg-rojo text-white p-2 rounded"
-                                                onClick={() => handleDelete(usuario.id)}>
+                                    </button>
+                                    <button className="bg-rojo text-white p-2 rounded" onClick={() => handleDelete(usuario.id)}>
                                         <RiDeleteBin6Fill />
-                                        </button>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                                    </button>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
             </div>
             <ToastContainer
                   position="top-right"

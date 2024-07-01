@@ -18,33 +18,71 @@ export const Listadepedidos = () => {
     navigate(path);
   };
 
+  // useEffect(() => {
+  //   const fetchPedidos = async () => {
+  //     try {
+  //       const response = await axios.get("/pedido");
+  //       const pedidosData = response.data.pedidos;
+
+  //       const usuariosData = await Promise.all(
+  //         pedidosData.map(async (pedido) => {
+  //           const usuarioResponse = await axios.get(`/usuarios/${pedido.userId}`);
+  //           return { userId: pedido.userId, usuario: usuarioResponse.data };
+  //         })
+  //       );
+
+  //       const usuariosMap = {};
+  //       usuariosData.forEach((data) => {
+  //         usuariosMap[data.userId] = data.usuario;
+  //       });
+
+  //       setPedidos(pedidosData);
+  //       setUsuarios(usuariosMap);
+  //     } catch (error) {
+  //       console.error("Error fetching pedidos:", error);
+  //     }
+  //   };
+
+  //   fetchPedidos();
+  // }, []);
+
   useEffect(() => {
     const fetchPedidos = async () => {
-      try {
-        const response = await axios.get("/pedido");
-        const pedidosData = response.data.pedidos;
+        try {
+            const response = await axios.get("/pedido");
+            const pedidosData = response.data.pedidos;
 
-        const usuariosData = await Promise.all(
-          pedidosData.map(async (pedido) => {
-            const usuarioResponse = await axios.get(`/usuarios/${pedido.userId}`);
-            return { userId: pedido.userId, usuario: usuarioResponse.data };
-          })
-        );
+            const usuariosData = await Promise.all(
+                pedidosData.map(async (pedido) => {
+                    try {
+                        const usuarioResponse = await axios.get(`/usuarios/${pedido.userId}`);
+                        return { userId: pedido.userId, usuario: usuarioResponse.data };
+                    } catch (error) {
+                        // Manejar el caso en el que el usuario no existe
+                        if (error.response && error.response.status === 404) {
+                            return { userId: pedido.userId, usuario: { nombre: "No encontrado" } };
+                        }
+                        // Lanza otros errores para ser capturados en el bloque de catch exterior
+                        throw error;
+                    }
+                })
+            );
 
-        const usuariosMap = {};
-        usuariosData.forEach((data) => {
-          usuariosMap[data.userId] = data.usuario;
-        });
+            const usuariosMap = {};
+            usuariosData.forEach((data) => {
+                usuariosMap[data.userId] = data.usuario;
+            });
 
-        setPedidos(pedidosData);
-        setUsuarios(usuariosMap);
-      } catch (error) {
-        console.error("Error fetching pedidos:", error);
-      }
+            setPedidos(pedidosData);
+            setUsuarios(usuariosMap);
+        } catch (error) {
+            console.error("Error fetching pedidos:", error);
+        }
     };
 
     fetchPedidos();
-  }, []);
+}, []);
+
 
   const handleDelete = async (pedidoId) => {
     try {
@@ -82,7 +120,7 @@ export const Listadepedidos = () => {
   };
 
   return (
-    <div className="w-[79%] mt-20">
+    <div className="w-[79%] mt-20 mq980:w-full">
       <div className="w-full h-full p-6">
         <div className="flex flex-row bg-white justify-between">
           <h1 className="font-bold text-2xl">Pedidos</h1>
@@ -97,23 +135,23 @@ export const Listadepedidos = () => {
           ) : (
             <div className="w-full flex flex-col">
               <div className="flex flex-row items-center font-bold text-lg">
-                <div className="border-b w-[12%] py-2">Fecha</div>
-                <div className="border-b w-[12%] py-2">Hora</div>
-                <div className="border-b w-[14%] py-2">Usuario</div>
-                <div className="border-b w-[18%] py-2">Método de envío</div>
-                <div className="border-b w-[14%] py-2">Total</div>
-                <div className="border-b w-[14%] py-2">Estado</div>
-                <div className="border-b w-[14%] py-2">Acciones</div>
+                <div className="border-b w-[12%] py-2 mq980:w-[25%]">Fecha</div>
+                <div className="border-b w-[12%] py-2 mq980:hidden">Hora</div>
+                <div className="border-b w-[14%] py-2 mq980:w-[25%]">Usuario</div>
+                <div className="border-b w-[18%] py-2 mq980:hidden">Método de envío</div>
+                <div className="border-b w-[14%] py-2 mq980:hidden">Total</div>
+                <div className="border-b w-[14%] py-2 mq980:w-[30%]">Estado</div>
+                <div className="border-b w-[14%] py-2 mq980:w-[20%]">Acciones</div>
               </div>
               {pedidos.map((pedido) => (
                 <div key={pedido.id} className="flex flex-col">
                   <div className="flex flex-row items-center">
-                    <div className="border-b w-[12%] py-4">{new Date(pedido.fecha).toLocaleDateString()}</div>
-                    <div className="border-b w-[12%] py-4">{pedido.hora}</div>
-                    <div className="border-b w-[14%] py-4">{usuarios[pedido.userId]?.usuario || "Cargando..."}</div>
-                    <div className="border-b w-[18%] py-4">{pedido.metodo_envio}</div>
-                    <div className="border-b w-[14%] py-4">${pedido.total}</div>
-                    <div className="border-b w-[14%] py-4">
+                    <div className="border-b w-[12%] py-4 mq980:w-[25%]">{new Date(pedido.fecha).toLocaleDateString()}</div>
+                    <div className="border-b w-[12%] py-4 mq980:hidden">{pedido.hora}</div>
+                    <div className="border-b w-[14%] py-4 mq980:w-[25%]">{usuarios[pedido.userId]?.usuario || "Cargando..."}</div>
+                    <div className="border-b w-[18%] py-4 mq980:hidden">{pedido.metodo_envio}</div>
+                    <div className="border-b w-[14%] py-4 mq980:hidden">${pedido.total}</div>
+                    <div className="border-b w-[14%] py-4 mq980:w-[30%]">
                       <select
                         value={pedido.estado}
                         onChange={(e) => handleEstadoChange(pedido.id, e.target.value)}
@@ -127,7 +165,7 @@ export const Listadepedidos = () => {
                         <option value="entregado">Entregado</option>
                       </select>
                     </div>
-                    <div className="border-b w-[14%] py-4 flex items-center">
+                    <div className="border-b w-[14%] py-4 flex items-center mq980:w-[20%] mq980:items-end">
                       <button
                         className="bg-gray-500 text-white  p-1 rounded"
                         onClick={() => goTo(`/admin/listadepedidos/${pedido.id}`)}

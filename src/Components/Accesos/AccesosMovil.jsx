@@ -2,9 +2,9 @@ import React, { useState } from "react";
 import { MdOutlineArticle } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import { BiCategory } from "react-icons/bi";
-import { AccesosMovil } from "./AccesosMovil";
+import { IoMenu } from "react-icons/io5";
 
-export const Accesos = () => {
+export const AccesosMovil = () => {
 
     const [visibleSections, setVisibleSections] = useState(new Set());
 
@@ -22,58 +22,75 @@ export const Accesos = () => {
     
     const goTo = (path) => {
         navigate(path);
+        setAccesosOpen(false)
     };
+
+    const [accesosOpen, setAccesosOpen] = useState(false)
+
+    const toggleAccesosOpen = () => {
+        setAccesosOpen(!accesosOpen)
+    }
 
     return (
      
-        <div className="flex px-2 mt-[74px] w-[21%] mq980:w-[50%] bg-gray-100 mq980:hidden">
-            <div className="p-6">
+        <div className="">
+            <div>
+                <IoMenu className="text-[30px] text-white" onClick={toggleAccesosOpen}/>
+            </div>
+            { accesosOpen && (
+            <div className="absolute top-0 left-0 w-full h-screen bg-black bg-opacity-50 z-50 flex flex-col">
+                <div className="bg-black rounded-sm shadow-md w-[60%] min-h-screen p-6">
                 <div>
+                    <IoMenu className="text-[30px] text-white mb-6" onClick={toggleAccesosOpen}/>
+                </div>
+                <div className="text-white">
                     <button className="font-semibold italic my-1"
                             onClick={() => handleToggleSection('productos')}>PRODUCTOS
                     </button>
                         { visibleSections.has('productos') && (
                             <div>
-                                <div className="flex flex-row items-center ml-4 px-2 py-1 rounded-md hover:bg-gray-100">
+                                <div className="flex flex-row items-center ml-4 px-2 py-1 rounded-md">
                                     <MdOutlineArticle />
-                                    <button className="italic ml-2" onClick={() => goTo('/admin/listadeproductos')}>Lista de productos</button>
+                                    <button className="italic ml-2" onClick={() => goTo('/admin/listadeproductos')}>Lista productos</button>
                                 </div>
-                                <div className="flex flex-row items-center ml-4 px-2 py-1 rounded-md hover:bg-gray-100">
+                                <div className="flex flex-row items-center ml-4 px-2 py-1 rounded-md">
                                     <BiCategory />
                                     <button className="italic ml-2" onClick={() => goTo('/admin/categorias')}>Categorías</button>
                                 </div>
                             </div>
                         )}
                 </div>
-                <div>
+                <div className="text-white">
                     <button className="font-semibold italic my-1"
                         onClick={() => handleToggleSection('usuarios')}>USUARIOS
                     </button>
                         {visibleSections.has('usuarios') && (
-                            <div className="flex flex-row items-center ml-4 px-2 py-1 rounded-md hover:bg-gray-100">
+                            <div className="flex flex-row items-center ml-4 px-2 py-1 rounded-md">
                                 <MdOutlineArticle />
                                 <button className="italic ml-2" onClick={() => goTo('/admin/listadeusuarios')}>Lista de usuarios</button>
                             </div>
                         )}
                 </div>
-                <div>
+                <div className="text-white">
                     <button className="font-semibold italic my-1"
                         onClick={() => handleToggleSection('ventas')}>VENTAS
                     </button>
                         {visibleSections.has('ventas') && (
                             <div> 
-                             <div className="flex flex-row items-center ml-4 px-2 py-1 rounded-md hover:bg-gray-100">
+                             <div className="flex flex-row items-center ml-4 px-2 py-1 rounded-md ">
                              <MdOutlineArticle />
                              <button className="italic ml-2" onClick={() => goTo('/admin/listadepedidos')}>Lista de pedidos</button>
                             </div>
-                            <div className="flex flex-row items-center ml-4 px-2 py-1 rounded-md hover:bg-gray-100">
+                            <div className="flex flex-row items-center ml-4 px-2 py-1 rounded-md">
                                 <MdOutlineArticle />
                                 <button className="italic ml-2" onClick={() => goTo('/admin/listadecarritos')}>Lista de carritos</button>
                             </div>
                             </div>
                         )}
                 </div>
+                </div>
             </div>
+            )}
         </div>
     )
 }

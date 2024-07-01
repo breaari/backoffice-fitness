@@ -33,33 +33,70 @@ export const Listadecarritos = () => {
 
     
 
+    // useEffect(() => {
+    //     const fetchCarritos = async () => {
+    //         try {
+    //             const response = await axios.get('/carrito');
+    //             const carritos = response.data.carritos;
+
+    //             const userRequests = carritos.map((carrito) => 
+    //                 axios.get(`/usuarios/${carrito.userId}`)
+    //             );
+
+    //             const usersResponses = await Promise.all(userRequests);
+
+    //             const usuariosMap = usersResponses.reduce((acc, response) => {
+    //                 const user = response.data;
+    //                 acc[user.id] = user;
+    //                 return acc;
+    //             }, {});
+
+    //             setCarritos(carritos);
+    //             setUsuarios(usuariosMap);
+    //         } catch (error) {
+    //             console.error("Error al obtener los carritos y usuarios:", error);
+    //         }
+    //     };
+
+    //     fetchCarritos();
+    // }, []);
+
     useEffect(() => {
         const fetchCarritos = async () => {
             try {
                 const response = await axios.get('/carrito');
                 const carritos = response.data.carritos;
-
-                const userRequests = carritos.map((carrito) => 
-                    axios.get(`/usuarios/${carrito.userId}`)
-                );
-
+    
+                const userRequests = carritos.map(async (carrito) => {
+                    try {
+                        const userResponse = await axios.get(`/usuarios/${carrito.userId}`);
+                        return { id: carrito.userId, data: userResponse.data };
+                    } catch (error) {
+                        if (error.response && error.response.status === 404) {
+                            return { id: carrito.userId, data: { nombre: "No encontrado", id: carrito.userId } };
+                        } else {
+                            throw error; // Re-throw other errors
+                        }
+                    }
+                });
+    
                 const usersResponses = await Promise.all(userRequests);
-
-                const usuariosMap = usersResponses.reduce((acc, response) => {
-                    const user = response.data;
-                    acc[user.id] = user;
+    
+                const usuariosMap = usersResponses.reduce((acc, { id, data }) => {
+                    acc[id] = data;
                     return acc;
                 }, {});
-
+    
                 setCarritos(carritos);
                 setUsuarios(usuariosMap);
             } catch (error) {
                 console.error("Error al obtener los carritos y usuarios:", error);
             }
         };
-
+    
         fetchCarritos();
     }, []);
+    
 
     const fetchProductDetails = async (productId) => {
         if (productos[productId]) {
@@ -94,23 +131,33 @@ export const Listadecarritos = () => {
     };
     
     return (
-        <div className="w-[79%] mt-20">
+        <div className="w-[79%] mt-20 mq980:w-full">
         <div className="w-full h-full p-6">
             <h1 className="font-bold text-2xl">Carritos pendientes</h1>
+            <div className="w-full flex flex-row font-semibold text-lg mt-6">
+                <div className="w-[10%]"></div>
+                <div className="w-[10%] hidden mq980:block"></div>
+                <div  className="w-[20%] mq980:hidden">Cant. productos</div> 
+                <div className="w-[50%] mq980:w-[60%] flex flex-row justify-between">
+                        <div  className="w-[50%] mq980:hidden">Usuario</div> 
+                        <div  className="w-[50%] mq980:w-full">Email</div> 
+                </div>
+                <div className="w-[20%]">Acciones</div>
+            </div>
             {carritos.length > 0 ? (
                 <div className="mt-4">
                     {carritos.map((carrito) => (
                         <div key={carrito.id} className="border-t py-4 my-2 w-full">
                             <div className="flex flex-row items-center">
                                 <TiShoppingCart className="text-4xl w-[10%]" />
-                                <p className="w-[20%]"><strong>Productos: </strong>{carrito.productos.length}</p>
+                                <p className="w-[20%] mq980:w-[10%]">{carrito.productos.length}</p>
                                 {usuarios[carrito.userId] && (
-                                    <div className="flex flex-row justify-between w-[50%]">
-                                        <p><strong>Usuario:</strong> {usuarios[carrito.userId].usuario}</p>
-                                        <p><strong>Email:</strong> {usuarios[carrito.userId].email}</p>
+                                    <div className="flex flex-row justify-between w-[50%] mq980:w-[60%]">
+                                        <p className="w-[50%] mq980:hidden">{usuarios[carrito.userId].usuario}</p>
+                                        <p className="w-[50%] mq980:w-full">{usuarios[carrito.userId].email}</p>
                                     </div>
                                 )}
-                                <div className="flex flex-row justify-center w-[20%]">
+                                <div className="flex flex-row justify-start w-[20%]">
                                     <button className="bg-rojo text-white p-1 rounded mr-4"
                                         onClick={() => eliminarCarritoHandler(carrito.id)}
                                     >
@@ -139,17 +186,16 @@ export const Listadecarritos = () => {
                                                 <div key={index} className="ml-8 mt-2">
                                                     {producto ? (
                                                         <div className="flex flex-row items-center">
-                                                            <div className="w-[10%]">
-                                                           </div>
-                                                           <div className="w-[10%]"> 
-                                                            <img 
-                                                                src={`https://back.paravosdistribuidora.com.ar/${producto.imagen.split(',')[0]}`} 
-                                                                alt={producto.name} 
-                                                                className="w-16 h-16 object-cover shadow-md"
-                                                            />
+                                                            <div className="w-[10%]"></div>
+                                                           <div className="w-[10%] mq980:w-[20%]"> 
+                                                                <img 
+                                                                    src={`https://back.paravosdistribuidora.com.ar/${producto.imagen.split(',')[0]}`} 
+                                                                    alt={producto.name} 
+                                                                    className="w-16 h-16 object-cover shadow-md"
+                                                                />
                                                             </div>
-                                                            <p className="font- w-[20%]">{producto.name}</p>
-                                                            <p className="w-[15%]"><strong>Cantidad:</strong> {cantidad}</p>
+                                                            <p className="font-semibold w-[20%] mq980:w-[40%]">{producto.name}</p>
+                                                            <p className="w-[15%] items-center"><strong>Cantidad:</strong> {cantidad}</p>
                                                         </div>
                                                     ) : (
                                                         <p>Cargando detalles del producto...</p>

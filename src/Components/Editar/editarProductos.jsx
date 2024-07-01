@@ -106,7 +106,7 @@ export const EditarProducto = () => {
 
     useEffect(() => {
         if (input.imagen && typeof input.imagen === 'string') {
-            const imageArray = input.imagen.split(',').map(path => `https://paravosdistribuidora.com.ar/${path}`);
+            const imageArray = input.imagen.split(',').map(path => `https://back.paravosdistribuidora.com.ar/${path}`);
             setImages(imageArray);
         }
 
@@ -161,12 +161,12 @@ export const EditarProducto = () => {
                 ...prevInputError,
                 preciocompra: { valid, error }
             }));
-        } else if (name === 'ganancia') {
-            const { valid, error } = isValidGanancia(value);
-            setInputError((prevInputError) => ({
-                ...prevInputError,
-                ganancia: { valid, error }
-            }));
+        // } else if (name === 'ganancia') {
+        //     const { valid, error } = isValidGanancia(value);
+        //     setInputError((prevInputError) => ({
+        //         ...prevInputError,
+        //         ganancia: { valid, error }
+        //     }));
         } else if (name === 'preciopromo') {
             const { valid, error } = isValidPreciopromo(value, input.precioventa, input.preciocompra);
             setInputError((prevInputError) => ({
@@ -228,18 +228,18 @@ export const EditarProducto = () => {
         
     };
 
-    useEffect(() => {
-        if (input.preciocompra && input.ganancia) {
-            const gananciaDecimal = parseFloat(input.ganancia) / 100;
-            const nuevoPrecioVenta = gananciaDecimal > 1
-                ? (parseFloat(input.preciocompra) * (1 + gananciaDecimal)).toFixed(2)
-                : (parseFloat(input.preciocompra) / (1 - gananciaDecimal)).toFixed(2);
-            setInput((prevInput) => ({
-                ...prevInput,
-                precioventa: nuevoPrecioVenta
-            }));
-        }
-    }, [input.preciocompra, input.ganancia]);
+    // useEffect(() => {
+    //     if (input.preciocompra && input.ganancia) {
+    //         const gananciaDecimal = parseFloat(input.ganancia) / 100;
+    //         const nuevoPrecioVenta = gananciaDecimal > 1
+    //             ? (parseFloat(input.preciocompra) * (1 + gananciaDecimal)).toFixed(2)
+    //             : (parseFloat(input.preciocompra) / (1 - gananciaDecimal)).toFixed(2);
+    //         setInput((prevInput) => ({
+    //             ...prevInput,
+    //             precioventa: nuevoPrecioVenta
+    //         }));
+    //     }
+    // }, [input.preciocompra, input.ganancia]);
 
     const renderImageContainers = () => {
         const containers = [];
@@ -249,7 +249,7 @@ export const EditarProducto = () => {
           containers.push(
             <div
               key={i}
-              className="flex flex-col w-[23%] h-[150px] border-2 border-rojo shadow-md rounded-md justify-center items-center cursor-pointer overflow-hidden relative"
+              className="flex flex-col w-[23%] mq980:w-[47%] h-[150px] border-2 border-rojo shadow-md rounded-md justify-center items-center cursor-pointer overflow-hidden relative"
               
             >
               {images[i] && (
@@ -360,10 +360,7 @@ export const EditarProducto = () => {
     const closeModal = () => {
         setSelectedImage(null);
     };
-
-    console.log("input:", input)
-    console.log("input sub:", input.subcategoriaId)
-
+    
     const colorOptions = [
         { value: 'rojo', label: '🔴 Rojo' },
         { value: 'verde', label: '🟢 Verde' },
@@ -377,7 +374,7 @@ export const EditarProducto = () => {
     ];
 
     return (
-        <div className="w-[79%] mt-[74px] px-32 flex flex-col">
+        <div className="w-[79%] mt-[74px] px-32 flex flex-col mq980:w-full mq980:px-6">
             <h1 className="font-bold text-2xl mb-2 mt-4">Editar producto</h1>
             <form onSubmit={handleSubmit}>
                 <div className="border border-grismedio rounded-md p-4 shadow-md">
@@ -456,12 +453,12 @@ export const EditarProducto = () => {
                 <div className="border border-grismedio rounded-md p-4 shadow-md">
                     <h1 className="font-semibold text-lg mb-2">Precio</h1>
                         <p className="text-rojo flex justify-center text-[14px]">{inputError.preciocompra.error}</p>
-                        <p className="text-rojo flex justify-center text-[14px]">{inputError.ganancia.error}</p>
+                        {/* <p className="text-rojo flex justify-center text-[14px]">{inputError.ganancia.error}</p> */}
                     
-                    <div className="flex flex-row justify-between">
+                    <div className="flex flex-row justify-between mq980:flex-col">
                         <div className="flex flex-col">
                                 <h2 className="text-sm my-2">Precio de compra</h2>
-                                <label className="border-grismedio border rounded-md px-2 py-1 text-sm">$
+                                <label className="border-grismedio border rounded-md px-2 py-1 text-sm mq980:w-[175px]">$
                                     <input className="text-sm focus:outline-none w-[100px] ml-1"
                                     type="number"
                                     min="1"
@@ -473,8 +470,8 @@ export const EditarProducto = () => {
                                     </input>ARS
                                 </label>
                         </div>
-                            <div  className="flex flex-col">
-                        <h2 className="text-sm my-2">Ganancia</h2>
+                            {/* <div  className="flex flex-col"> */}
+                        {/* <h2 className="text-sm my-2">Ganancia</h2>
                             <label className="border-grismedio border rounded-md px-2 py-1 text-sm">
                                 <input type="number" 
                                         className="w-[60px] text-sm focus:outline-none"
@@ -485,11 +482,11 @@ export const EditarProducto = () => {
                                         value={input.ganancia}   
                                         onChange={handleChange}
                                 ></input>
-                            % </label>
-                            </div>
+                            % </label> */}
+                            {/* </div> */}
                                 <div  className="flex flex-col">
                                 <h2 className="text-sm my-2">Precio de venta</h2>
-                                <label className="border-grismedio border rounded-md px-2 py-1 text-sm">$
+                                <label className="border-grismedio border rounded-md px-2 py-1 text-sm mq980:w-[175px]">$
                                     <input className="text-sm focus:outline-none ml-1 w-[100px]"
                                             type="text"
                                             value={input.precioventa} 
@@ -499,7 +496,7 @@ export const EditarProducto = () => {
                                 </div>
                                 <div  className="flex flex-col">
                                     <h2 className="text-sm my-2">Precio promocional</h2>
-                                        <label className="border-grismedio border rounded-md px-2 py-1 text-sm">$
+                                        <label className="border-grismedio border rounded-md px-2 py-1 text-sm mq980:w-[175px]">$
                                             <input className="text-sm focus:outline-none ml-1 w-[100px]"
                                             type="number"
                                             min="1"
