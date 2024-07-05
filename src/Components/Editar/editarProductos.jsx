@@ -54,7 +54,6 @@ export const EditarProducto = () => {
     const [input, setInput] = useState(initialInput);
     const [inputError, setInputError] = useState(initialErrors);
     const [subcategorias, setSubcategorias] = useState([]);
-    console.log("subcategorias:", subcategorias)
     const [images, setImages] = useState([]);
     const [newImages, setNewImages] = useState([]);
     const [selectedImage, setSelectedImage] = useState(null);
@@ -66,6 +65,11 @@ export const EditarProducto = () => {
             try {
                 const response = await axios.get(`/productos/${id}`);
                 const producto = response.data.producto;
+
+                if (producto.imagen === null) {
+                    producto.imagen = ""; // Establecer imagen como cadena vacía
+                }
+        
                 setInput(producto);
                 // Convertir la cadena de imágenes en un array de URLs completas
                 if (producto.imagen) {
