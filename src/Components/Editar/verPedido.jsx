@@ -8,37 +8,6 @@ export const VerPedido = () => {
   const [productosDetalles, setProductosDetalles] = useState([]);
   const [usuario, setUsuario] = useState(null);
 
-  console.log("pedido:", productosDetalles)
-
-  // useEffect(() => {
-  //   const fetchPedido = async () => {
-  //     try {
-  //       const response = await axios.get(`/pedido/${id}`);
-  //       const pedidoData = response.data.pedido;
-  //       setPedido(pedidoData);
-
-  //       // Obtener detalles de los productos
-  //       const productosData = await Promise.all(
-  //         pedidoData.pedido.map(async (producto) => {
-  //           const productoResponse = await axios.get(`/productos/${producto.productId}`);
-  //           return { ...productoResponse.data, cantidad: producto.cantidad };
-  //         })
-  //       );
-
-  //       setProductosDetalles(productosData);
-
-  //       // Obtener detalles del usuario
-  //       const usuarioResponse = await axios.get(`/usuarios/${pedidoData.userId}`);
-  //       setUsuario(usuarioResponse.data);
-
-  //     } catch (error) {
-  //       console.error("Error fetching pedido:", error);
-  //     }
-  //   };
-
-  //   fetchPedido();
-  // }, [id]);
-
   useEffect(() => {
     const fetchPedido = async () => {
         try {
@@ -93,26 +62,26 @@ export const VerPedido = () => {
     )
   }
 
-  const detallesEnvio = () => {
-    if (pedido.metodo_envio === "envio gratis") {
-      return (
-        <>
-          <p><strong>Indicaciones de entrega:</strong> {pedido.indicaciones_entrega || 'N/A'}</p>
-          <p><strong>Tipo de dirección:</strong> {pedido.tipo_direccion || 'N/A'}</p>
-        </>
-      );
-    } else if (pedido.metodo_envio === "por correo") {
-      return (
-        <>
-          <p><strong>Sucursal o domicilio:</strong> {pedido.sucursal_o_domicilio}</p>
-          <p><strong>Empresa de transporte:</strong> {pedido.empresa_transporte}</p>
-          <p><strong>Link de seguimiento:</strong> {pedido.link_seguimiento || 'N/A'}</p>
-        </>
-      );
-    } else {
-      return null; // Manejar otros métodos de envío según sea necesario
-    }
-  };
+//   const detallesEnvio = () => {
+//     if (pedido.metodo_envio === "envio gratis") {
+//       return (
+//         <>
+//           <p><strong>Indicaciones de entrega:</strong> {pedido.indicaciones_entrega || 'N/A'}</p>
+//           <p><strong>Tipo de dirección:</strong> {pedido.tipo_direccion || 'N/A'}</p>
+//         </>
+//       );
+//     } else if (pedido.metodo_envio === "por correo") {
+//       return (
+//         <>
+//           <p><strong>Sucursal o domicilio:</strong> {pedido.sucursal_o_domicilio}</p>
+//           <p><strong>Empresa de transporte:</strong> {pedido.empresa_transporte}</p>
+//           <p><strong>Link de seguimiento:</strong> {pedido.link_seguimiento || 'N/A'}</p>
+//         </>
+//       );
+//     } else {
+//       return null; // Manejar otros métodos de envío según sea necesario
+//     }
+//   };
 
   const calcularDescuento = (precioventa, preciopromo) => {
     if (isNaN(preciopromo) || preciopromo === null || preciopromo >= precioventa) {
@@ -140,9 +109,9 @@ console.log("productosdetalles 111:", productosDetalles)
                         </div>
                         <p><strong>Estado:</strong> {pedido.estado}</p>
                         <div className="flex flex-col">
-                            <p><strong>Dirección de entrega:</strong> {pedido.direccion_entrega}</p>
-                            <p><strong>Método de envío:</strong> {pedido.metodo_envio}</p>
-                            {detallesEnvio()}
+                            {/* <p><strong>Dirección de entrega:</strong> {pedido.direccion_entrega}</p>
+                            <p><strong>Método de envío:</strong> {pedido.metodo_envio}</p> */}
+                            {/* {detallesEnvio()} */}
                             <p><strong>Total:</strong> ${pedido.total}</p>
                         </div>
                     </div>
@@ -150,9 +119,10 @@ console.log("productosdetalles 111:", productosDetalles)
                 <div className="flex flex-col border shadow-md rounded-sm p-4">
                     <h1 className="font-bold text-2xl mb-4">Información del usuario</h1>
                     <p><strong>Usuario:</strong> {usuario.usuario}</p>
-                    <p><strong>Número de contacto:</strong> {pedido.numero_contacto}</p>
+                    {/* <p><strong>Número de contacto:</strong> {pedido.numero_contacto}</p> */}
                     <p><strong>Email:</strong> {usuario.email}</p>
                 </div>
+             
         </div>
         <div className="flex flex-col border shadow-md rounded-sm p-4 mt-12">
             <h1 className="font-bold text-2xl mb-4">Pedido</h1>
