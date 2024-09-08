@@ -195,44 +195,86 @@ export const Listadepedidos = () => {
     navigate(path);
   };
 
+  // useEffect(() => {
+  //   const fetchPedidos = async () => {
+  //     try {
+  //       const response = await axios.get("/pedido");
+  //       const pedidosData = response.data.pedidos;
+  //       console.log("pedidosData:", pedidosData)
+
+  //       const usuariosData = await Promise.all(
+  //         pedidosData.map(async (pedido) => {
+  //           try {
+  //             const usuarioResponse = await axios.get(`/usuarios/${pedido.userId}`);
+  //             return { userId: pedido.userId, usuario: usuarioResponse.data };
+  //           } catch (error) {
+  //             if (error.response && error.response.status === 404) {
+  //               return { userId: pedido.userId, usuario: { nombre: "No encontrado" } };
+  //             }
+  //             throw error;
+  //           }
+  //         })
+  //       );
+
+  //       const usuariosMap = {};
+  //       usuariosData.forEach((data) => {
+  //         usuariosMap[data.userId] = data.usuario;
+  //       });
+
+  //       // Ordenar los pedidos por fecha (más reciente primero)
+  //       pedidosData.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+
+  //       setPedidos(pedidosData);
+  //       setUsuarios(usuariosMap);
+  //     } catch (error) {
+  //       console.error("Error fetching pedidos:", error);
+  //     }
+  //   };
+
+  //   fetchPedidos();
+  // }, []);
+
   useEffect(() => {
     const fetchPedidos = async () => {
-      try {
-        const response = await axios.get("/pedido");
-        const pedidosData = response.data.pedidos;
-        console.log("pedidosData:", pedidosData)
+        try {
+            const response = await axios.get("/pedido");
+            const pedidosData = response.data.pedidos;
+            console.log("pedidosData:", pedidosData);
 
-        const usuariosData = await Promise.all(
-          pedidosData.map(async (pedido) => {
-            try {
-              const usuarioResponse = await axios.get(`/usuarios/${pedido.userId}`);
-              return { userId: pedido.userId, usuario: usuarioResponse.data };
-            } catch (error) {
-              if (error.response && error.response.status === 404) {
-                return { userId: pedido.userId, usuario: { nombre: "No encontrado" } };
-              }
-              throw error;
-            }
-          })
-        );
+            const usuariosData = await Promise.all(
+                pedidosData
+                    .filter(pedido => pedido.userId !== null) // Filtrar pedidos con userId no nulo
+                    .map(async (pedido) => {
+                        try {
+                            const usuarioResponse = await axios.get(`/usuarios/${pedido.userId}`);
+                            return { userId: pedido.userId, usuario: usuarioResponse.data };
+                        } catch (error) {
+                            if (error.response && error.response.status === 404) {
+                                return { userId: pedido.userId, usuario: { nombre: "No encontrado" } };
+                            }
+                            throw error;
+                        }
+                    })
+            );
 
-        const usuariosMap = {};
-        usuariosData.forEach((data) => {
-          usuariosMap[data.userId] = data.usuario;
-        });
+            const usuariosMap = {};
+            usuariosData.forEach((data) => {
+                usuariosMap[data.userId] = data.usuario;
+            });
 
-        // Ordenar los pedidos por fecha (más reciente primero)
-        pedidosData.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+            // Ordenar los pedidos por fecha (más reciente primero)
+            pedidosData.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
 
-        setPedidos(pedidosData);
-        setUsuarios(usuariosMap);
-      } catch (error) {
-        console.error("Error fetching pedidos:", error);
-      }
+            setPedidos(pedidosData);
+            setUsuarios(usuariosMap);
+        } catch (error) {
+            console.error("Error fetching pedidos:", error);
+        }
     };
 
     fetchPedidos();
-  }, []);
+}, []);
+
 
   const handleDelete = async (pedidoId) => {
     try {
@@ -298,7 +340,7 @@ export const Listadepedidos = () => {
                   <div className="flex flex-row items-center">
                     <div className="border-b w-[15%] py-4 mq980:w-[25%]">{new Date(pedido.fecha).toLocaleDateString()}</div>
                     <div className="border-b w-[15%] py-4 mq980:hidden">{pedido.hora}</div>
-                    <div className="border-b w-[15%] py-4 mq980:w-[25%]">{usuarios[pedido.userId]?.usuario || "Cargando..."}</div>
+                    <div className="border-b w-[15%] py-4 mq980:w-[25%]">{usuarios[pedido.userId]?.usuario || "Sin usuario"}</div>
                     {/* <div className="border-b w-[18%] py-4 mq980:hidden">{pedido.metodo_envio}</div> */}
                     <div className="border-b w-[18%] py-4 mq980:hidden">${pedido.total}</div>
                     <div className="border-b w-[18%] py-4 mq980:w-[30%]">

@@ -8,7 +8,7 @@ export const VerPedido = () => {
   const [productosDetalles, setProductosDetalles] = useState([]);
   const [usuario, setUsuario] = useState(null);
 
-  useEffect(() => {
+useEffect(() => {
     const fetchPedido = async () => {
         try {
             const response = await axios.get(`/pedido/${id}`);
@@ -33,16 +33,20 @@ export const VerPedido = () => {
 
             setProductosDetalles(productosData);
 
-            // Obtener detalles del usuario
-            try {
-                const usuarioResponse = await axios.get(`/usuarios/${pedidoData.userId}`);
-                setUsuario(usuarioResponse.data);
-            } catch (error) {
-                if (error.response && error.response.status === 404) {
-                    setUsuario({ nombre: "No encontrado" });
-                } else {
-                    throw error; // Lanza otros errores para ser capturados en el bloque de catch exterior
+            // Obtener detalles del usuario si userId no es nulo
+            if (pedidoData.userId !== null) {
+                try {
+                    const usuarioResponse = await axios.get(`/usuarios/${pedidoData.userId}`);
+                    setUsuario(usuarioResponse.data);
+                } catch (error) {
+                    if (error.response && error.response.status === 404) {
+                        setUsuario({ nombre: "No encontrado" });
+                    } else {
+                        throw error; // Lanza otros errores para ser capturados en el bloque de catch exterior
+                    }
                 }
+            } else {
+                setUsuario({ nombre: "No especificado" });
             }
         } catch (error) {
             console.error("Error fetching pedido:", error);
@@ -53,7 +57,6 @@ export const VerPedido = () => {
 }, [id]);
 
 
-
   if (!pedido || !usuario) {
     return (
         <div className='flex w-[79%] mq980:w-full h-screen justify-center items-center'>
@@ -61,27 +64,7 @@ export const VerPedido = () => {
         </div>
     )
   }
-
-//   const detallesEnvio = () => {
-//     if (pedido.metodo_envio === "envio gratis") {
-//       return (
-//         <>
-//           <p><strong>Indicaciones de entrega:</strong> {pedido.indicaciones_entrega || 'N/A'}</p>
-//           <p><strong>Tipo de dirección:</strong> {pedido.tipo_direccion || 'N/A'}</p>
-//         </>
-//       );
-//     } else if (pedido.metodo_envio === "por correo") {
-//       return (
-//         <>
-//           <p><strong>Sucursal o domicilio:</strong> {pedido.sucursal_o_domicilio}</p>
-//           <p><strong>Empresa de transporte:</strong> {pedido.empresa_transporte}</p>
-//           <p><strong>Link de seguimiento:</strong> {pedido.link_seguimiento || 'N/A'}</p>
-//         </>
-//       );
-//     } else {
-//       return null; // Manejar otros métodos de envío según sea necesario
-//     }
-//   };
+  console.log("pedido:", pedido)
 
   const calcularDescuento = (precioventa, preciopromo) => {
     if (isNaN(preciopromo) || preciopromo === null || preciopromo >= precioventa) {
@@ -95,7 +78,7 @@ const calcularSubtotal = (precio, cantidad) => {
     return (precio * cantidad).toFixed(2);
 };
 
-console.log("productosdetalles 111:", productosDetalles)
+
   return (
     <div className="w-[79%] mt-20 mq980:w-full">
       <div className="w-full h-full p-12 bg-white flex flex-col">
@@ -109,9 +92,6 @@ console.log("productosdetalles 111:", productosDetalles)
                         </div>
                         <p><strong>Estado:</strong> {pedido.estado}</p>
                         <div className="flex flex-col">
-                            {/* <p><strong>Dirección de entrega:</strong> {pedido.direccion_entrega}</p>
-                            <p><strong>Método de envío:</strong> {pedido.metodo_envio}</p> */}
-                            {/* {detallesEnvio()} */}
                             <p><strong>Total:</strong> ${pedido.total}</p>
                         </div>
                     </div>
@@ -119,8 +99,8 @@ console.log("productosdetalles 111:", productosDetalles)
                 <div className="flex flex-col border shadow-md rounded-sm p-4">
                     <h1 className="font-bold text-2xl mb-4">Información del usuario</h1>
                     <p><strong>Usuario:</strong> {usuario.usuario}</p>
-                    {/* <p><strong>Número de contacto:</strong> {pedido.numero_contacto}</p> */}
                     <p><strong>Email:</strong> {usuario.email}</p>
+                    <p><strong>Teléfono:</strong> { pedido.telefono }</p>
                 </div>
              
         </div>
@@ -181,9 +161,6 @@ console.log("productosdetalles 111:", productosDetalles)
         );
     })}
 </div>
-
-
-
             <div className=" flex flex-row w-[100%] py-4 px-2 ">
                 <div className="flex flex-row w-[30%] mq980:hidden">
                     <div className="w-[30%]"></div>

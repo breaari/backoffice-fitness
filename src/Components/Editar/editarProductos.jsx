@@ -165,12 +165,14 @@ export const EditarProducto = () => {
                 ...prevInputError,
                 preciocompra: { valid, error }
             }));
-        // } else if (name === 'ganancia') {
-        //     const { valid, error } = isValidGanancia(value);
-        //     setInputError((prevInputError) => ({
-        //         ...prevInputError,
-        //         ganancia: { valid, error }
-        //     }));
+
+        } else if (name === 'precioventa') {
+            const { valid, error } = isValidPrecioventa(value, input.precioventa, input.preciocompra);
+            setInputError((prevInputError) => ({
+                ...prevInputError,
+                precioventa: { valid, error }
+            }));
+
         } else if (name === 'preciopromo') {
             const { valid, error } = isValidPreciopromo(value, input.precioventa, input.preciocompra);
             setInputError((prevInputError) => ({
@@ -231,19 +233,6 @@ export const EditarProducto = () => {
             }));
         
     };
-
-    // useEffect(() => {
-    //     if (input.preciocompra && input.ganancia) {
-    //         const gananciaDecimal = parseFloat(input.ganancia) / 100;
-    //         const nuevoPrecioVenta = gananciaDecimal > 1
-    //             ? (parseFloat(input.preciocompra) * (1 + gananciaDecimal)).toFixed(2)
-    //             : (parseFloat(input.preciocompra) / (1 - gananciaDecimal)).toFixed(2);
-    //         setInput((prevInput) => ({
-    //             ...prevInput,
-    //             precioventa: nuevoPrecioVenta
-    //         }));
-    //     }
-    // }, [input.preciocompra, input.ganancia]);
 
     const renderImageContainers = () => {
         const containers = [];
@@ -474,27 +463,18 @@ export const EditarProducto = () => {
                                     </input>ARS
                                 </label>
                         </div>
-                            {/* <div  className="flex flex-col"> */}
-                        {/* <h2 className="text-sm my-2">Ganancia</h2>
-                            <label className="border-grismedio border rounded-md px-2 py-1 text-sm">
-                                <input type="number" 
-                                        className="w-[60px] text-sm focus:outline-none"
-                                        min="1"
-                                        max="999"
-                                        step="0.5"
-                                        name="ganancia"
-                                        value={input.ganancia}   
-                                        onChange={handleChange}
-                                ></input>
-                            % </label> */}
-                            {/* </div> */}
                                 <div  className="flex flex-col">
                                 <h2 className="text-sm my-2">Precio de venta</h2>
                                 <label className="border-grismedio border rounded-md px-2 py-1 text-sm mq980:w-[175px]">$
                                     <input className="text-sm focus:outline-none ml-1 w-[100px]"
-                                            type="text"
+                                            type="number"
+                                            min="1"
+                                            max="1000000"
+                                            step="1"
+                                            name="precioventa"
                                             value={input.precioventa} 
-                                            readOnly>
+                                            onChange={handleChange}
+                                            >
                                     </input>ARS
                                 </label>
                                 </div>
@@ -505,7 +485,7 @@ export const EditarProducto = () => {
                                             type="number"
                                             min="1"
                                             max="1000000"
-                                            step="0.01"
+                                            step="1"
                                             name="preciopromo"
                                             value={input.preciopromo}   
                                             onChange={handleChange}>

@@ -106,7 +106,7 @@ export const Listadeproductos = () => {
     
     useEffect(() => {
         fetchProductos("", selectedCategoria, selectedSubcategoria, selectedStock);
-      }, ["", selectedCategoria, selectedSubcategoria, selectedStock]);
+      }, [ selectedCategoria, selectedSubcategoria, selectedStock]);
       
       const handleSearch = async (e) => {
         e.preventDefault();
@@ -147,43 +147,7 @@ const toggleFilter = () => {
     setShowFilter(true)
   }
 };
-    
-    //! //! //! //! //! //! //! //! //! //!
-     
-    const updateProducto = async (productId, newData) => {
-        try {
-            const currentProduct = productos.find(producto => producto.id === productId);
-            if (!currentProduct) {
-                throw new Error('Producto no encontrado');
-            }
-    
-            const updatedData = {
-                ...currentProduct,
-                ...newData,
-                stock: typeof newData.stock === 'object' ? JSON.stringify(newData.stock) : currentProduct.stock,
-                precioventa: currentProduct.precioventa ? parseFloat(currentProduct.precioventa) : 0,
-                preciocompra: currentProduct.preciocompra ? parseFloat(currentProduct.preciocompra) : 0,
-                preciopromo: newData.preciopromo !== undefined ? (isNaN(parseFloat(newData.preciopromo)) ? null : parseFloat(newData.preciopromo)) : currentProduct.preciopromo
-            };
-    
-            if (isNaN(updatedData.precioventa) || isNaN(updatedData.preciocompra)) {
-                throw new Error('Valores numéricos no válidos');
-            }
-    
-            console.log('Sending updatedData:', updatedData);
-    
-            await axios.put(`/productos/${productId}`, updatedData);
-    
-            const updatedProductos = productos.map(producto =>
-                producto.id === productId ? updatedData : producto
-            );
-            setProductos(updatedProductos);
-        } catch (error) {
-            console.error('Error al actualizar el producto:', error);
-        }
-    };
-    
-    
+
     const handleStockChange = async (productId, newStock) => {
         try {
             await updateProducto(productId, { stock: newStock });
@@ -191,47 +155,83 @@ const toggleFilter = () => {
             console.error('Error al actualizar el stock del producto:', error);
         }
     };
-    
-    const handlePrecioCompraChange = async (productId, newPrecioCompra) => {
-        try {
-            await updateProducto(productId, {
-                preciocompra: newPrecioCompra,
-                precioventa: calculatePrecioVenta(newPrecioCompra, productos.find(producto => producto.id === productId).ganancia)
-            });
-        } catch (error) {
-            console.error('Error al actualizar el precio de compra del producto:', error);
-        }
-    };
+  
 
-    const calculatePrecioVenta = (precioCompra, ganancia) => {
-        const precioCompraNumber = parseFloat(precioCompra);
-        const gananciaNumber = parseFloat(ganancia);
-        const precioVenta = precioCompraNumber + (precioCompraNumber * (gananciaNumber / 100));
-        return precioVenta.toFixed(2);
-    };
+    // Función para manejar el cambio en el precio de compra
+const handlePrecioCompraChange = async (productId, newPrecioCompra) => {
+    try {
+        // Actualizar solo el campo de precio de compra
+        await updateProducto(productId, {
+            preciocompra: newPrecioCompra,
+        });
+    } catch (error) {
+        console.error('Error al actualizar el precio de compra del producto:', error);
+    }
+};
 
-    const handlePrecioPromoChange = async (productId, newPrecioPromo) => {
-        try {
-            const updatedProduct = productos.find(producto => producto.id === productId);
-        
-            if (updatedProduct) {
-                // Determinar el valor correcto de preciopromo
-                const preciopromoValue = newPrecioPromo ? parseFloat(newPrecioPromo) : null;
-        
-                // Actualizar optimistamente el precio promocional en la UI
-                const updatedProductos = productos.map(producto =>
-                    producto.id === productId ? { ...producto, preciopromo: preciopromoValue } : producto
-                );
-                setProductos(updatedProductos);
-        
-                // Enviar la solicitud para actualizar el producto en el backend
-                await updateProducto(productId, { preciopromo: preciopromoValue });
-            }
-        } catch (error) {
-            console.error('Error al actualizar el precio promocional del producto:', error);
+// Función para manejar el cambio en el precio de venta
+const handlePrecioVentaChange = async (productId, newPrecioVenta) => {
+    try {
+        // Actualizar solo el campo de precio de venta
+        await updateProducto(productId, { 
+            precioventa: newPrecioVenta
+        });
+    } catch (error) {
+        console.error('Error al actualizar el precio de venta del producto:', error);
+    }
+};
+
+// Función para manejar el cambio en el precio promocional
+const handlePrecioPromoChange = async (productId, newPrecioPromo) => {
+    try {
+        const updatedProduct = productos.find(producto => producto.id === productId);
+
+        if (updatedProduct) {
+            // Determinar el valor correcto de preciopromo
+            const preciopromoValue = newPrecioPromo ? parseFloat(newPrecioPromo) : null;
+
+            // Actualizar optimistamente el precio promocional en la UI
+            const updatedProductos = productos.map(producto =>
+                producto.id === productId ? { ...producto, preciopromo: preciopromoValue } : producto
+            );
+            setProductos(updatedProductos);
+
+            // Enviar la solicitud para actualizar el producto en el backend
+            await updateProducto(productId, { preciopromo: preciopromoValue });
         }
-    };
-    
+    } catch (error) {
+        console.error('Error al actualizar el precio promocional del producto:', error);
+    }
+};
+
+// Función para actualizar un producto
+const updateProducto = async (productId, newData) => {
+    try {
+        const currentProduct = productos.find(producto => producto.id === productId);
+        if (!currentProduct) {
+            throw new Error('Producto no encontrado');
+        }
+
+        // Crear un objeto con solo los campos que han cambiado
+        const updatedData = {
+            ...currentProduct,
+            ...newData,
+            stock: typeof newData.stock === 'object' ? JSON.stringify(newData.stock) : currentProduct.stock,
+            precioventa: newData.precioventa !== undefined ? (isNaN(parseFloat(newData.precioventa)) ? currentProduct.precioventa : parseFloat(newData.precioventa)) : currentProduct.precioventa,
+            preciocompra: newData.preciocompra !== undefined ? (isNaN(parseFloat(newData.preciocompra)) ? currentProduct.preciocompra : parseFloat(newData.preciocompra)) : currentProduct.preciocompra,
+            preciopromo: newData.preciopromo !== undefined ? (isNaN(parseFloat(newData.preciopromo)) ? null : parseFloat(newData.preciopromo)) : currentProduct.preciopromo
+        };
+
+        await axios.put(`/productos/${productId}`, updatedData);
+
+        const updatedProductos = productos.map(producto =>
+            producto.id === productId ? updatedData : producto
+        );
+        setProductos(updatedProductos);
+    } catch (error) {
+        console.error('Error al actualizar el producto:', error);
+    }
+};
     
     const handleDelete = async (id) => {
         try {
@@ -410,8 +410,8 @@ const toggleFilter = () => {
                                 max={10000000} 
                                 type="number" 
                                 value={producto.precioventa} 
-                                readOnly
                                 className="text-sm px-2 w-[80px] focus:outline-none" 
+                                onChange={(e) => handlePrecioVentaChange(producto.id, e.target.value)}
                             />
                         </label>
                     </div>
